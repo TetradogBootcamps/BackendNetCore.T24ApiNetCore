@@ -48,11 +48,11 @@ namespace BackendNetCore.T24ApiNetCore.Migrations
 
             modelBuilder.Entity("BackendNetCore.T24ApiNetCore.Models.AsignadoA", b =>
                 {
-                    b.Property<int>("ProyectoId")
-                        .HasColumnType("int");
+                    b.Property<string>("ProyectoId")
+                        .HasColumnType("varchar(4)");
 
-                    b.Property<int>("CientificoId")
-                        .HasColumnType("int");
+                    b.Property<string>("CientificoId")
+                        .HasColumnType("varchar(8)");
 
                     b.HasKey("ProyectoId", "CientificoId");
 
@@ -63,9 +63,9 @@ namespace BackendNetCore.T24ApiNetCore.Migrations
 
             modelBuilder.Entity("BackendNetCore.T24ApiNetCore.Models.Cientifico", b =>
                 {
-                    b.Property<int>("DNI")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<string>("DNI")
+                        .HasMaxLength(8)
+                        .HasColumnType("varchar(8)");
 
                     b.Property<string>("NombreCompleto")
                         .HasMaxLength(255)
@@ -78,9 +78,9 @@ namespace BackendNetCore.T24ApiNetCore.Migrations
 
             modelBuilder.Entity("BackendNetCore.T24ApiNetCore.Models.Proyecto", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<string>("Id")
+                        .HasMaxLength(4)
+                        .HasColumnType("varchar(4)");
 
                     b.Property<int>("Horas")
                         .HasColumnType("int");

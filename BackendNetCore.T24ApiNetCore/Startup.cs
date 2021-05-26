@@ -32,6 +32,8 @@ namespace BackendNetCore.T24ApiNetCore
 
             services.AddDbContext<T24Context>(options =>
                     options.UseMySQL(Configuration.GetConnectionString("Default")));
+            //documentación api
+            services.AddSwaggerGen();
 
         }
 
@@ -52,6 +54,17 @@ namespace BackendNetCore.T24ApiNetCore
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "T24 NetCore Api V1");
+                c.RoutePrefix = string.Empty;
             });
         }
     }

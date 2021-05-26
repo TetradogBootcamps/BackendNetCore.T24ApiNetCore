@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace BackendNetCore.T24ApiNetCore.Models
 {
-    public class Cientifico
+    public class Proyecto
     {
-        public int Id => DNI;
-        [Key]
-        public int DNI { get; set; }
+        public Proyecto() => AsignadoAs = new List<AsignadoA>();
+    
+        [MaxLength(4)]
+        public string Id { get; set; }
         [MaxLength(255)]
-        public string NombreCompleto { get; set; }
+        public string Nombre { get; set; }
+        public int Horas { get; set; }
         public ICollection<AsignadoA> AsignadoAs { get; set; }
     }
 }

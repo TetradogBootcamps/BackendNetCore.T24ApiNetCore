@@ -4,7 +4,7 @@ using MySql.EntityFrameworkCore.Metadata;
 
 namespace BackendNetCore.T24ApiNetCore.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,8 +12,7 @@ namespace BackendNetCore.T24ApiNetCore.Migrations
                 name: "Cientificos",
                 columns: table => new
                 {
-                    DNI = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    DNI = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: false),
                     NombreCompleto = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true)
                 },
                 constraints: table =>
@@ -42,8 +41,7 @@ namespace BackendNetCore.T24ApiNetCore.Migrations
                 name: "Proyectos",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Id = table.Column<string>(type: "varchar(4)", maxLength: 4, nullable: false),
                     Nombre = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true),
                     Horas = table.Column<int>(type: "int", nullable: false)
                 },
@@ -77,8 +75,8 @@ namespace BackendNetCore.T24ApiNetCore.Migrations
                 name: "AsignadoAs",
                 columns: table => new
                 {
-                    CientificoId = table.Column<int>(type: "int", nullable: false),
-                    ProyectoId = table.Column<int>(type: "int", nullable: false)
+                    CientificoId = table.Column<string>(type: "varchar(8)", nullable: false),
+                    ProyectoId = table.Column<string>(type: "varchar(4)", nullable: false)
                 },
                 constraints: table =>
                 {

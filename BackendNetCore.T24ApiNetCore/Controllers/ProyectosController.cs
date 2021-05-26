@@ -27,15 +27,15 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
         public async Task<ActionResult<Proyecto>> Get(int id)
         {
             ActionResult<Proyecto> result;
-            Proyecto proyectos = await Context.FindAsync<Proyecto>(id);
+            Proyecto proyecto = await Context.FindAsync<Proyecto>(id);
 
-            if (Equals(proyectos, default))
+            if (Equals(proyecto, default))
             {
                 result = NotFound();
             }
             else
             {
-                result = proyectos;
+                result = proyecto;
             }
 
             return result;
@@ -45,7 +45,7 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
         {
             ActionResult result;
 
-            if (id == proyecto.Id)
+            if (id.ToString() == proyecto.Id)
             {
                 Context.Entry(proyecto).State = EntityState.Modified;
                 try
@@ -78,6 +78,33 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
             await Context.SaveChangesAsync();
             return CreatedAtAction(nameof(Get), new { id = proyecto.Id }, proyecto);
         }
+        [HttpPost("{idProyecto}/asignarCientifico/{idCientifico}")]
+        public async Task<ActionResult<AsignadoA>> Post(string idProyecto,string idCientifico)
+        {
+            Proyecto proyecto;
+            AsignadoA asignadoA;
+            Cientifico cientifico = await Context.Cientificos.FindAsync(idCientifico);
+            ActionResult result = NotFound();
+
+            if (!Equals(cientifico, default))
+            {
+                proyecto = await Context.Proyectos.FindAsync(idProyecto);
+                if (!Equals(proyecto, default))
+                {
+                    asignadoA = new AsignadoA(cientifico, proyecto);
+
+                    if (!await Context.AsignadoAs.AnyAsync(a => a.Equals(asignadoA)))
+                    {
+                        Context.AsignadoAs.Add(asignadoA);
+                        await Context.SaveChangesAsync();
+
+                    }
+                    result = Ok(asignadoA);
+                }
+            }
+
+            return result;
+        }
         [HttpDelete("{id}")]
         public async Task<ActionResult<Proyecto>> Delete(int id)
         {
@@ -93,6 +120,37 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
             {
                 result = NotFound();
             }
+            return result;
+        }
+        [HttpDelete("{idProyecto}/quitarCientifico/{idCientifico}")]
+        public async Task<ActionResult<AsignadoA>> Delete(string idProyecto, string idCientifico)
+        {
+            Proyecto proyecto;
+            AsignadoA asignadoA;
+            Cientifico cientifico = await Context.Cientificos.FindAsync(idCientifico);
+            ActionResult result = NotFound();
+
+            if (!Equals(cientifico, default))
+            {
+                proyecto = await Context.Proyectos.FindAsync(idProyecto);
+                if (!Equals(proyecto, default))
+                {
+                    asignadoA = new AsignadoA { CientificoId = idCientifico, ProyectoId = idProyecto };
+                    asignadoA = await Context.AsignadoAs.FirstOrDefaultAsync(a => a.Equals(asignadoA));
+
+                    if (!Equals(asignadoA,default))
+                    {
+                        asignadoA.Cientifico = cientifico;
+                        asignadoA.Proyecto = proyecto;
+                        Context.AsignadoAs.Remove(asignadoA);
+                        await Context.SaveChangesAsync();
+                        result = Ok(asignadoA);
+                    }
+
+                   
+                }
+            }
+
             return result;
         }
     }

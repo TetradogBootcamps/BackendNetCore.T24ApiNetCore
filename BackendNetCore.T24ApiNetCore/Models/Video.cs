@@ -18,7 +18,7 @@ namespace BackendNetCore.T24ApiNetCore
         //si el campo es opcional tiene que ser nullable si es struct
 
         public int? ClienteId { get; set; }
-        [ForeignKey("ClienteId")]
+        [ForeignKey("ClienteId"),NotMapped]
         public Cliente Cliente { get; set; }
     }
 }

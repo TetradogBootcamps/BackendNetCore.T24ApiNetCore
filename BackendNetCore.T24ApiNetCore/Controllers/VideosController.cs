@@ -86,6 +86,7 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
 
 
         }
+
         [HttpDelete("{id}")]
         public async Task<ActionResult<Video>> Delete(int id)
         {
