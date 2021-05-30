@@ -3,14 +3,16 @@ using System;
 using BackendNetCore.T24ApiNetCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BackendNetCore.T24ApiNetCore.Migrations
 {
     [DbContext(typeof(T24Context))]
-    partial class T24ContextModelSnapshot : ModelSnapshot
+    [Migration("20210530170753_AddForeingKey")]
+    partial class AddForeingKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

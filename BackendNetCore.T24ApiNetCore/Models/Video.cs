@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BackendNetCore.T24ApiNetCore
@@ -18,7 +19,7 @@ namespace BackendNetCore.T24ApiNetCore
         //si el campo es opcional tiene que ser nullable si es struct
 
         public int? ClienteId { get; set; }
-        //[ForeignKey("ClienteId"),NotMapped]
-        //public Cliente Cliente { get; set; }
+        [JsonIgnore]
+        public Cliente Cliente { get; set; }
     }
 }
