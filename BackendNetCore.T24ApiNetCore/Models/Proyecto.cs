@@ -8,13 +8,13 @@ namespace BackendNetCore.T24ApiNetCore.Models
 {
     public class Proyecto
     {
-        public Proyecto() => AsignadoAs = new List<AsignadoA>();
+        //public Proyecto() => AsignadoAs = new List<AsignadoA>();
     
         [MaxLength(4)]
         public string Id { get; set; }
         [MaxLength(255)]
         public string Nombre { get; set; }
         public int Horas { get; set; }
-        public ICollection<AsignadoA> AsignadoAs { get; set; }
+        //public List<AsignadoA> AsignadoAs { get; set; }
     }
 }

@@ -24,7 +24,7 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Cientifico>> Get(int id)
+        public async Task<ActionResult<Cientifico>> Get(string id)
         {
             ActionResult<Cientifico> result;
             Cientifico cientifico = await Context.FindAsync<Cientifico>(id);
@@ -40,12 +40,32 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
 
             return result;
         }
+        [HttpGet("{id}/proyectos")]
+        public async Task<ActionResult<AsignadoA>> GetProyectos(string id)
+        {
+            ActionResult<AsignadoA> result;
+            List<AsignadoA> proyectosAsignados;
+            Cientifico cientifico = await Context.FindAsync<Cientifico>(id);
+
+            if (Equals(cientifico, default))
+            {
+                result = NotFound();
+            }
+            else
+            {
+                proyectosAsignados = new List<AsignadoA>();
+                proyectosAsignados.AddRange(Context.AsignadoAs.Where(a=>Equals(a.CientificoId,cientifico.Id)));
+                result = Ok(proyectosAsignados);
+            }
+
+            return result;
+        }
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, Cientifico cientifico)
+        public async Task<ActionResult> Put(string id, Cientifico cientifico)
         {
             ActionResult result;
 
-            if (id.ToString() == cientifico.Id)
+            if (Equals(id, cientifico.Id))
             {
                 Context.Entry(cientifico).State = EntityState.Modified;
                 try
@@ -72,7 +92,7 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
             return result;
         }
 
-        [HttpPost("{idCientifico}/asignarProyecto/{idProyecto}")]
+        [HttpPost("{idCientifico}/Proyecto/{idProyecto}")]
         public async Task<ActionResult<AsignadoA>> Post(string idCientifico, string idProyecto)
         {
             Proyecto proyecto;
@@ -87,7 +107,7 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
                 {
                     asignadoA = new AsignadoA(cientifico,proyecto);
 
-                    if (!await Context.AsignadoAs.AnyAsync(a => a.Equals(asignadoA)))
+                    if (!await Context.ExistAsignadoA(idProyecto,idCientifico))
                     {
                         Context.AsignadoAs.Add(asignadoA);
                         await Context.SaveChangesAsync();
@@ -108,7 +128,7 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
             return CreatedAtAction(nameof(Get), new { id = cientifico.Id }, cientifico);
         }
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Cientifico>> Delete(int id)
+        public async Task<ActionResult<Cientifico>> Delete(string id)
         {
             ActionResult<Cientifico> result;
             Cientifico cientifico = await Context.FindAsync<Cientifico>(id);
@@ -124,7 +144,7 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
             }
             return result;
         }
-        [HttpDelete("{idCientifico}/quitarProyecto/{idProyecto}")]
+        [HttpDelete("{idCientifico}/Proyecto/{idProyecto}")]
         public async Task<ActionResult<AsignadoA>> Delete(string idCientifico,string idProyecto)
         {
             Proyecto proyecto;
@@ -137,14 +157,13 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
                 proyecto = await Context.Proyectos.FindAsync(idProyecto);
                 if (!Equals(proyecto, default))
                 {
-                    asignadoA = new AsignadoA { CientificoId = idCientifico, ProyectoId = idProyecto };
-                    asignadoA = await Context.AsignadoAs.FirstOrDefaultAsync(a => a.Equals(asignadoA));
+                    asignadoA = await Context.FindAsignadoA(idProyecto,idCientifico);
 
                     if (!Equals(asignadoA, default))
                     {
                         //creo que si se configura bien queda todo bien asignado...
-                        asignadoA.Cientifico = cientifico;
-                        asignadoA.Proyecto = proyecto;
+                        //asignadoA.Cientifico = cientifico;
+                        //asignadoA.Proyecto = proyecto;
 
                         Context.AsignadoAs.Remove(asignadoA);
                         await Context.SaveChangesAsync();

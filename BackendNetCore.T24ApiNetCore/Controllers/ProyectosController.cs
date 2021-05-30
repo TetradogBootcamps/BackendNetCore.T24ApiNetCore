@@ -24,7 +24,7 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Proyecto>> Get(int id)
+        public  async Task<ActionResult<Proyecto>> Get(string id)
         {
             ActionResult<Proyecto> result;
             Proyecto proyecto = await Context.FindAsync<Proyecto>(id);
@@ -40,12 +40,32 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
 
             return result;
         }
+        [HttpGet("{id}/cientificos")]
+        public async Task<ActionResult<AsignadoA>> GetCientificos(string id)
+        {
+            ActionResult<AsignadoA> result;
+            List<AsignadoA> cientificosAsignados;
+            Proyecto proyecto = await Context.FindAsync<Proyecto>(id);
+
+            if (Equals(proyecto, default))
+            {
+                result = NotFound();
+            }
+            else
+            {
+                cientificosAsignados = new List<AsignadoA>();
+                cientificosAsignados.AddRange(Context.AsignadoAs.Where(a => Equals(a.ProyectoId, proyecto.Id)));
+                result = Ok(cientificosAsignados);
+            }
+
+            return result;
+        }
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, Proyecto proyecto)
+        public async Task<ActionResult> Put(string id, Proyecto proyecto)
         {
             ActionResult result;
 
-            if (id.ToString() == proyecto.Id)
+            if (Equals(id,proyecto.Id))
             {
                 Context.Entry(proyecto).State = EntityState.Modified;
                 try
@@ -78,22 +98,22 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
             await Context.SaveChangesAsync();
             return CreatedAtAction(nameof(Get), new { id = proyecto.Id }, proyecto);
         }
-        [HttpPost("{idProyecto}/asignarCientifico/{idCientifico}")]
+        [HttpPost("{idProyecto}/Cientifico/{idCientifico}")]
         public async Task<ActionResult<AsignadoA>> Post(string idProyecto,string idCientifico)
         {
             Proyecto proyecto;
             AsignadoA asignadoA;
-            Cientifico cientifico = await Context.Cientificos.FindAsync(idCientifico);
+            Cientifico cientifico = await Context.FindAsync<Cientifico>(idCientifico);
             ActionResult result = NotFound();
 
             if (!Equals(cientifico, default))
             {
-                proyecto = await Context.Proyectos.FindAsync(idProyecto);
+                proyecto = await Context.FindAsync<Proyecto>(idProyecto);
                 if (!Equals(proyecto, default))
                 {
                     asignadoA = new AsignadoA(cientifico, proyecto);
 
-                    if (!await Context.AsignadoAs.AnyAsync(a => a.Equals(asignadoA)))
+                    if (!await Context.ExistAsignadoA(idProyecto,idCientifico))
                     {
                         Context.AsignadoAs.Add(asignadoA);
                         await Context.SaveChangesAsync();
@@ -106,10 +126,10 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
             return result;
         }
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Proyecto>> Delete(int id)
+        public async Task<ActionResult<Proyecto>> Delete(string id)
         {
             ActionResult<Proyecto> result;
-            Proyecto proyecto = await Context.FindAsync<Proyecto>(id);
+            Proyecto proyecto =  await Context.FindAsync<Proyecto>(id);
             if (!Equals(proyecto, default))
             {
                 Context.Remove(proyecto);
@@ -122,26 +142,27 @@ namespace BackendNetCore.T24ApiNetCore.Controllers
             }
             return result;
         }
-        [HttpDelete("{idProyecto}/quitarCientifico/{idCientifico}")]
+        [HttpDelete("{idProyecto}/Cientifico/{idCientifico}")]
         public async Task<ActionResult<AsignadoA>> Delete(string idProyecto, string idCientifico)
         {
             Proyecto proyecto;
             AsignadoA asignadoA;
-            Cientifico cientifico = await Context.Cientificos.FindAsync(idCientifico);
+            Cientifico cientifico = await Context.FindAsync<Cientifico>(idCientifico);
             ActionResult result = NotFound();
 
             if (!Equals(cientifico, default))
             {
-                proyecto = await Context.Proyectos.FindAsync(idProyecto);
+                proyecto = await Context.FindAsync<Proyecto>(idProyecto);
                 if (!Equals(proyecto, default))
                 {
-                    asignadoA = new AsignadoA { CientificoId = idCientifico, ProyectoId = idProyecto };
-                    asignadoA = await Context.AsignadoAs.FirstOrDefaultAsync(a => a.Equals(asignadoA));
+                    asignadoA =await Context.FindAsignadoA(idProyecto,idCientifico);
+            
 
                     if (!Equals(asignadoA,default))
                     {
-                        asignadoA.Cientifico = cientifico;
-                        asignadoA.Proyecto = proyecto;
+                        //asignadoA.Cientifico = cientifico;
+                        //asignadoA.Proyecto = proyecto;
+                        //no se si es buena idea incluir en el JSON información que si se quiere se puede solicitar...
                         Context.AsignadoAs.Remove(asignadoA);
                         await Context.SaveChangesAsync();
                         result = Ok(asignadoA);
